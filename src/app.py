@@ -80,6 +80,23 @@ def login():
     access_token = create_access_token(identity=email)
     return jsonify(access_token=access_token)
 
+@app.route("/signup", methods=["POST"])
+def signup():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+    
+    if (email != user.email) or password != (user.password) :
+        return jsonify({"msg": "Bad email or password"}), 401
+    else:
+        db.session.add(email)
+        db.session.commit(email)
+        db.session.add(password)
+        db.session.commit(email)
+
+    access_token = create_access_token(identity=email)
+    return jsonify(access_token=access_token)
+
+
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
