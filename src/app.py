@@ -60,8 +60,8 @@ def handle_hello():
     }
     return jsonify(response_body), 200
 # Setup the Flask-JWT-Extended extension
-    app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
-    jwt = JWTManager(app)
+app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+jwt = JWTManager(app)
 
 @app.route("/login", methods=["POST"])
 def login():
