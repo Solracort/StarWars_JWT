@@ -53,25 +53,20 @@ def handle_personaje():
 
     return jsonify(response_body), 200
 
-
 @app.route('/user', methods=['GET'])
 def handle_hello():
-
     response_body = {
         "msg": "Hello, this is your GET /user response "
     }
-
     return jsonify(response_body), 200
-
 # Setup the Flask-JWT-Extended extension
-app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
-jwt = JWTManager(app)
+    app.config["JWT_SECRET_KEY"] = "super-secret"  # Change this!
+    jwt = JWTManager(app)
 
 @app.route("/login", methods=["POST"])
 def login():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
-    
     user = User.query.filter_by(email=email).first()
     
     if (email != user.email) or password != (user.password) :
@@ -82,20 +77,22 @@ def login():
 
 @app.route("/signup", methods=["POST"])
 def signup():
-    email = request.json.get("email", None)
-    password = request.json.get("password", None)
+    request_body =request.json
+    newuser = User(email=request_body["email"],password= request_body["password"])
     
-    if (email != user.email) or password != (user.password) :
-        return jsonify({"msg": "Bad email or password"}), 401
-    else:
-        db.session.add(email)
-        db.session.commit(email)
-        db.session.add(password)
-        db.session.commit(email)
-
-    access_token = create_access_token(identity=email)
-    return jsonify(access_token=access_token)
-
+    db.session.add(newuser)
+    db.session.commit()
+    response_body = {"msg":"Usuario Credo correctamente"}
+    return jsonify(response_body), 200
+    
+@app.route("/profile", methods=["GET"])
+@jwt_required()
+def get_profile():
+    
+    # Access the identity of the current user with get_jwt_identity
+    current_user = get_jwt_identity()
+    user = User.query.filter_by(email=current_user).first()
+    return jsonify({"result":user.serialize()}), 200
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
